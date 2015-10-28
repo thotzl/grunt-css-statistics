@@ -1,7 +1,7 @@
 {
   "name": "grunt-css-statistics",
   "description": "Grunt plugin of cssstats.com",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "homepage": "https://github.com/thotzl/grunt-css-statistics",
   "author": {
     "name": "Torsten 'thotzl' Hötzel",
