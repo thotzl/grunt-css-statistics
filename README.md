@@ -1,6 +1,6 @@
 # grunt-cssstats
 
-> Grunt plugin of cssstats.com, Generates Json and HTML output.
+> Grunt plugin of cssstats.com. Generates Json and HTML output.
 
 This is beta. No unit tests yet. With some config variations it may be buggy. 
 
@@ -151,4 +151,5 @@ grunt.initConfig({
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
 
 ## Release History
+0.8.3 - minor changes on readme.md
 0.8.0
