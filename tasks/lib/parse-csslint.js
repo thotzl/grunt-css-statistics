@@ -46,9 +46,12 @@ var getLintResult = function getLintResult(cssObject, ruleset) {
 
 var getRuleset = function getRuleset(defaultRules, options) {
 
+    if (!options.hasOwnProperty('ruleset')) {
+        return defaultRules;
+    }
+
     var ruleset = {};
 
-    if (options.hasOwnProperty('ruleset')) {
 
         defaultRules.forEach(function (rule) {
             if (options.ruleset.hasOwnProperty(rule.id)) {
@@ -59,7 +62,6 @@ var getRuleset = function getRuleset(defaultRules, options) {
                 ruleset[rule.id] = true;
             }
         });
-    }
 
     return ruleset;
 };
