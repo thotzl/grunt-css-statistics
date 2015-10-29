@@ -1,4 +1,4 @@
-# grunt-cssstats
+# grunt-css-statistics
 
 > Grunt plugin of cssstats.com. Generates Json and HTML output.
 
@@ -79,7 +79,7 @@ Every Css property in this array will be added to the uniqueDeclarations section
 Type: `Bool`
 Default value: `false`
 
-If set to `true` the original CssStats Object from the Node module will be added to the grunt-cssstats object.
+If set to `true` the original CssStats Object from the Node module will be added to the grunt-css-statistics object.
 You will only get a viewable output in the JSON file.
 
 #### options.addRawCss
@@ -102,6 +102,50 @@ Default value: `false`
 
 If set to `true` the you will get the 'Selector Specificity' and the 'Ruleset Size' as a graph in the html file.
 Warning: If you're working with really large CSS files this can slow down the process extremely.
+
+#### options.csslint
+Type: `Bool | String | Object`
+Default value: `false`
+
+CSSLint is not included in the dependencies. You have to install it first with `npm install csslint --save-dev`.
+For more information about CSSLint visit https://github.com/stubbornella/csslint/wiki.
+
+For more information about CSSLint rules visit https://github.com/CSSLint/csslint/wiki/Rules.
+
+##### Case `Bool`
+
+```js
+  csslint: true
+```
+
+You will get the analysis of your Stylesheets with CSSLint's standard ruleset. 
+
+##### Case `String`
+
+```js
+  csslint: 'path/to/ruleset.json'
+```
+You will get the analysis of your Stylesheets with your own ruleset. Your own ruleset will be merged with the CSSLint standards.
+You have to set rules to false if you don't want them.
+Ruleset files have to be JSON.
+
+##### Case `Object`
+
+```js
+  csslint:            {
+    clearDefaults: false,                         // true = deletes all standard rules
+    ruleset:  {
+        rulesetFile: 'path/to/rulesetFile.json', // path to your ruleset file
+        'zero-units': true,                      // adds zero-units to ruleset
+        'adjoining-classes': false
+    },
+    groupResults: true                           // group analysis by rules
+  }
+```
+Take a look at the comments.
+
+##### todo
+Add ability to define own rules.
 
 ### Usage Examples
 
@@ -138,7 +182,16 @@ grunt.initConfig({
       addOrigin:          false,
       addRawCss:          false,
       addHtmlStyles:      false,
-      addGraphs:          false
+      addGraphs:          false,
+      csslint:            {
+        clearDefaults: false,
+        ruleset:  {
+            rulesetFile: 'path/to/rulesetFile.json',
+            'zero-units': true,
+            'adjoining-classes': true
+        },
+        groupResults: true
+      }
     },
     files: {
       'path/to/outputFolder': ['path/to/src/**/*.css']
@@ -151,5 +204,6 @@ grunt.initConfig({
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
 
 ## Release History
+- 0.9.0 - added csslint option
 - 0.8.4 - minor changes on readme.md
 - 0.8.0

@@ -1,5 +1,5 @@
 /*
- * grunt-cssstats
+ * grunt-css-statistics
  * https://github.com/thotzl/grunt-css-statistics
  *
  * Copyright (c) 2015 Torsten 'thotzl' Hötzel

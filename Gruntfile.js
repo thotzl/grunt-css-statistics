@@ -1,5 +1,5 @@
 /*
- * grunt-cssstats
+ * grunt-css-statistics
  * https://github.com/thotzl/grunt-css-statistics
  *
  * Copyright (c) 2015 Torsten 'thotzl' Hötzel
@@ -39,15 +39,7 @@ module.exports = function(grunt) {
         addRawCss:      false,
         addHtmlStyles:  false,
         addGraphs:      true,
-        csslint:        {
-          clearDefaults: false,
-          ruleset:  {
-            rulesetFile: 'test/fixtures/csslint_ruleset.json',
-            'zero-units': true,
-            'adjoining-classes': true
-          },
-          groupResults: true
-        }
+        csslint:        false
       },
       compact: {
         files: {
