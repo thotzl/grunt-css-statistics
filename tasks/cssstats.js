@@ -1,29 +1,35 @@
 /*
- * grunt-cssstats
- * https://github.com/Preis24/grunt-cssstats
+ * grunt-css-statistics
+ * https://github.com/thotzl/grunt-css-statistics
  *
- * Copyright (c) 2015 Torsten 'thotzl' Hötzel @Preis24.de
+ * Copyright (c) 2015 Torsten 'thotzl' Hötzel
  * Licensed under the MIT license.
  */
 
 'use strict';
 
-var fs = require("fs"); // Load the filesystem module
-var cssstats = require("cssstats");
-var path = require("path"); // Path tools
-var q = require("q"); // q
-var chalk = require('chalk');
+var app = {
+    fs: require("fs"),
+    cssstats: require("cssstats"),
+    path: require("path"),
+    q: require("q"),
+    chalk: require('chalk'),
 
-var parseHtml = require('./lib/parse-html.js');
+    parseHtml: require('./lib/parse-html.js'),
+    parseCsslint: require('./lib/parse-csslint.js')
+};
 
-var chalkError = chalk.bold.red;
-var chalkNeutral = chalk.bold.bgWhite.gray;
-var chalkWarn = chalk.bold.yellow;
-var chalkSuccess = chalk.bold.green;
-var chalkInfo = chalk.bold.blue;
-var chalkDebug = chalk.bgYellow.black;
+    app.chalkError = app.chalk.red;
+    app.chalkNeutral = app.chalk.bgWhite.gray;
+    app.chalkWarn = app.chalk.yellow;
+    app.chalkSuccess = app.chalk.green;
+    app.chalkInfo = app.chalk.blue;
+    app.chalkDebug = app.chalk.bgYellow.black;
+
 
 module.exports = function (grunt) {
+
+    app.grunt = grunt;
 
     var options,
         defaultOptions = {
@@ -31,7 +37,7 @@ module.exports = function (grunt) {
             jsonOutput: true,
             htmlOutput: true,
 
-            fileSize: true,
+            fileSize:           true,
             uniqueDeclarations: [
                 'font-size',
                 'float',
@@ -43,7 +49,8 @@ module.exports = function (grunt) {
             addOrigin:          false,
             addRawCss:          false,
             addHtmlStyles:      false,
-            addGraphs:          false
+            addGraphs:          false,
+            csslint:            false
         };
 
     /**
@@ -57,15 +64,19 @@ module.exports = function (grunt) {
      * @param css
      * @returns {{fileSize: {size: string, gzipSize: string}, selectorSpecifity: {}, totals: {rules: (result.total|*|List.total|results.total|test.total|total), selectors: *, declarations: (result.total|*|List.total|results.total|test.total|total), properties: number, vendorPrefixes: *, mediaQueries: (result.total|*|List.total|results.total|test.total|total), importants: *}, uniqueDeclarations: {}, selectors: {type: *, class: *, id: *, pseudoClass: *, pseudoElement: *}, propertyResets: {}, uniqueValues: {colors: {}, backgroundColors: {}, fontSizes: {}, fontFamilies: {}}, uniqueMediaQueries: {}}}
      */
-    var parseStats = function parseStats(css) {
+    var parseStats = function parseStats(cssObject) {
 
-        var origin = cssstats(css);
+        var css = cssObject.concat;
+
+        grunt.log.writeln(app.chalkSuccess('grunt-css-statistics start to build object from cssstats result ...'));
+
+        var origin = app.cssstats(css);
         var stats = {
-            fileSize: {
+            fileSize:          {
                 size:     getSizeUnit(origin.size),
-                gzipSize:  getSizeUnit(origin.gzipSize)
+                gzipSize: getSizeUnit(origin.gzipSize)
             },
-            selectorSpecifity:  {},
+            selectorSpecifity: {},
 
             totals: {
                 rules:          origin.rules.total,
@@ -88,7 +99,7 @@ module.exports = function (grunt) {
                 "pseudoElement": origin.selectors.pseudoElement
             },
 
-            propertyResets:     {},
+            propertyResets: {},
 
             uniqueValues: {
                 colors:           getValueCount(origin.declarations.properties['color']),
@@ -101,16 +112,20 @@ module.exports = function (grunt) {
         };
 
         if (options.addGraphs) {
+            grunt.log.writeln('adding graph data ...');
+
             stats.graphs = {};
             stats.graphs.selectorSpecificity = origin.selectors.getSpecificityGraph();
             stats.graphs.rulesetSize = origin.rules.size.graph;
         }
 
         if (options.addRawCss) {
+            grunt.log.writeln('adding concatinated raw css ...');
             stats.rawCss = css;
         }
 
         if (options.addOrigin) {
+            grunt.log.writeln(app.chalkInfo('adding original cssstats object ...'));
             stats.origin = origin;
         }
 
@@ -118,9 +133,11 @@ module.exports = function (grunt) {
         for (var prop in origin.declarations.properties) {
             if (origin.declarations.properties.hasOwnProperty(prop)) {
                 if (options.uniqueDeclarations.indexOf(prop) > -1) {
+
+                    grunt.log.writeln('determine unique declarations of "' + app.chalkInfo(prop) + '" ...');
+
                     stats.uniqueDeclarations[prop] = origin.declarations.properties[prop].length;
                 }
-
                 stats.totals.properties = stats.totals.properties + 1;
             }
         }
@@ -130,7 +147,10 @@ module.exports = function (grunt) {
             [];
 
         if (origin.declarations.properties['background']) {
-            origin.declarations.properties['background'].forEach( function (bg) {
+            grunt.log.writeln('determine background-colors from background properties ...');
+
+            origin.declarations.properties['background'].forEach(function (bg) {
+
                 var bgColor = bg.match(/#[0-9a-fA-F]+|#[0-9]|#[A-F]+|#[a-f]+|(rgba|rgb)\([0-9,.]+?\)/g);
 
                 if (bgColor) {
@@ -147,7 +167,9 @@ module.exports = function (grunt) {
             [];
 
         if (origin.declarations.properties['font']) {
-            origin.declarations.properties['font'].forEach( function (f) {
+            grunt.log.writeln('determine font-sizes from font properties ...');
+
+            origin.declarations.properties['font'].forEach(function (f) {
                 var fontSize = f.match(/([\d.])+ ?(em|ex|%|dpx|px|cm|mm|in|pt|pc|ch|rem|vh|vw|vmin|vmax)\/?[\d.]?|(inherit|small|smaller|big|bigger)/g);
 
                 if (fontSize) {
@@ -161,6 +183,16 @@ module.exports = function (grunt) {
 
         stats.propertyResets = origin.declarations.getPropertyResets();
         stats.selectorSpecifity = origin.selectors.specificity;
+
+        if (options.csslint) {
+
+            var linted = app.parseCsslint(app, options.csslint, cssObject);
+
+            if (linted) {
+                stats.lint = linted;
+            }
+        }
+
         return stats;
     };
 
@@ -171,7 +203,7 @@ module.exports = function (grunt) {
      * @param size
      * @returns {string}
      */
-    var getSizeUnit = function getSizeUnit (size) {
+    var getSizeUnit = function getSizeUnit(size) {
         var kbFactor = 1024;
         var mbFactor = kbFactor * 1024;
         var gbFactor = mbFactor * 1024;
@@ -234,19 +266,19 @@ module.exports = function (grunt) {
                 biggest = val > biggest ? val : biggest;
 
                 if (/[0-9.]/g.test(val)) {
-                    temp.push( {
-                                   viewSizePx: val,
-                                   viewSizeStr: '',
-                                   cssSize:  prop,
-                                   amount:   fontSizes[prop]
-                               });
+                    temp.push({
+                                  viewSizePx:  val,
+                                  viewSizeStr: '',
+                                  cssSize:     prop,
+                                  amount:      fontSizes[prop]
+                              });
                 } else {
-                    temp.push( {
-                                   viewSizePx: 0,
-                                   viewSizeStr: val,
-                                   cssSize:  prop,
-                                   amount:   fontSizes[prop]
-                               });
+                    temp.push({
+                                  viewSizePx:  0,
+                                  viewSizeStr: val,
+                                  cssSize:     prop,
+                                  amount:      fontSizes[prop]
+                              });
                 }
 
 
@@ -254,8 +286,8 @@ module.exports = function (grunt) {
         }
 
 
-        r = temp.sort(function(a,b) {
-            return  b.viewSizePx - a.viewSizePx;
+        r = temp.sort(function (a, b) {
+            return b.viewSizePx - a.viewSizePx;
         });
 
         return r;
@@ -296,10 +328,14 @@ module.exports = function (grunt) {
 
         this.files.forEach(function (file) {
 
-            var destJson = path.join(file.dest, target + '.cssstats.json');
-            var destHtml = path.join(file.dest, target + '.cssstats.html');
+            var destJson = app.path.join(file.dest, target + '.cssstats.json');
+            var destHtml = app.path.join(file.dest, target + '.cssstats.html');
 
-            var css = file.src.filter(function (filepath) {
+            var css = {
+                concat: ''
+            };
+
+            css.concat = file.src.filter(function (filepath) {
                 // Remove nonexistent files (it's up to you to filter or warn here).
                 if (!grunt.file.exists(filepath)) {
                     grunt.log.warn('Source file "' + filepath + '" not found.');
@@ -309,7 +345,11 @@ module.exports = function (grunt) {
                 }
             }).map(function (filepath) {
                 // Read and return the file's source.
-                return fs.readFileSync(filepath, 'utf8');
+
+                css[filepath] = app.fs.readFileSync(filepath, 'utf8');
+
+                return '/****\n    source: ' + filepath + '\n****/\n\n' + css[filepath];
+
             }).join('\n');
 
             var stats = parseStats(css);
@@ -324,11 +364,10 @@ module.exports = function (grunt) {
             }
 
             if (options.htmlOutput) {
-                var output = parseHtml(options, stats, css);
+                var output = app.parseHtml(app, options, stats, css);
                 grunt.file.write(destHtml, output);
             }
         });
-
 
     };
 
