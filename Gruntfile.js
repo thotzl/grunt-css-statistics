@@ -1,8 +1,8 @@
 /*
  * grunt-cssstats
- * https://github.com/Preis24/grunt-cssstats
+ * https://github.com/thotzl/grunt-css-statistics
  *
- * Copyright (c) 2015 Torsten 'thotzl' Hötzel @Preis24.de
+ * Copyright (c) 2015 Torsten 'thotzl' Hötzel
  * Licensed under the MIT license.
  */
 
@@ -36,9 +36,18 @@ module.exports = function(grunt) {
         htmlOutput:   true,
 
         addOrigin:      true,
-        addRawCss:      true,
-        addHtmlStyles:  true,
-        addGraphs:      true
+        addRawCss:      false,
+        addHtmlStyles:  false,
+        addGraphs:      true,
+        csslint:        {
+          clearDefaults: false,
+          ruleset:  {
+            rulesetFile: 'test/fixtures/csslint_ruleset.json',
+            'zero-units': true,
+            'adjoining-classes': true
+          },
+          groupResults: true
+        }
       },
       compact: {
         files: {

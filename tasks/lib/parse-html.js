@@ -1,6 +1,9 @@
-var fs = require("fs"); // Load the filesystem module
+var fs;
 
-var parseHtml = function parseHtml(options, stats, css) {
+var parseHtml = function parseHtml(a, options, stats, css) {
+
+    fs = a.fs;
+
     var styles = fs.readFileSync(__dirname + '/resources/styles.css', 'utf8');
     var template = fs.readFileSync(__dirname + '/resources/template.html', 'utf8');
     var output = '';
@@ -38,6 +41,11 @@ var parseHtml = function parseHtml(options, stats, css) {
                     break;
                 case 'origin':
                     break;
+                case 'lint':
+                    output += '<section class="cssstats_' + prop + '">' + "\n";
+                    output += options.csslint.groupResults ? getGroupedLintSection(stats[prop], prop) : getLintSection(stats[prop], prop);
+                    output += '</section>' + "\n";
+                    break;
                 default:
                     output += '<section class="cssstats_' + prop + '">' + "\n";
                     output += getDefaultSection(stats[prop], prop);
@@ -48,7 +56,7 @@ var parseHtml = function parseHtml(options, stats, css) {
 
 
     template = template.replace('{{ main_content }}', output + "\n")
-                        .replace('{{ styles }}', styles + "\n");
+        .replace('{{ styles }}', styles + "\n");
 
     return template + "\n";
 };
@@ -59,17 +67,17 @@ var parseHtml = function parseHtml(options, stats, css) {
  * @param str
  * @returns {string}
  */
-var camelCaseToSpace = function camelCaseToSpace (str) {
+var camelCaseToSpace = function camelCaseToSpace(str) {
 
-    var spaced =    str.replace(/([A-Z])/g, function($1){
-        return " "+$1;
+    var spaced = str.replace(/([A-Z])/g, function ($1) {
+        return " " + $1;
     });
 
     var spaced = spaced.split(' ');
     var spacedUppercased = '';
     var i = 1;
 
-    spaced.forEach( function (s) {
+    spaced.forEach(function (s) {
         spacedUppercased += s.charAt(0).toUpperCase() + s.substr(1);
         if (i < spaced.length) {
             spacedUppercased += ' ';
@@ -89,9 +97,9 @@ var camelCaseToSpace = function camelCaseToSpace (str) {
  * @param markup
  * @returns {string}
  */
-var getHtmlByKeyVal = function getHtmlByKeyVal (obj, markup) {
+var getHtmlByKeyVal = function getHtmlByKeyVal(obj, markup) {
 
-var output = '';
+    var output = '';
     for (var prop in obj) {
         if (obj.hasOwnProperty(prop)) {
 
@@ -117,7 +125,7 @@ var output = '';
  * @param str
  * @returns {string}
  */
-var getHeadline = function getHeadline (str) {
+var getHeadline = function getHeadline(str) {
     return '<h2>' + camelCaseToSpace(str) + '</h2>' + "\n";
 };
 
@@ -130,16 +138,16 @@ var getHeadline = function getHeadline (str) {
  * @param parent
  * @returns {string}
  */
-var getSizeSection = function getSizeSection (obj, parent) {
+var getSizeSection = function getSizeSection(obj, parent) {
 
-    var output =    getHeadline(parent);
+    var output = getHeadline(parent);
 
-    var markUp =    '<div class="cssstats_col cssstats_' + parent +'_{{ class }}">' +
-                    '<span class="cssstats_' + parent + '_prop">{{ prop.upper }}:</span>' +
-                    '<span class="cssstats_' + parent + '_value">{{ value }}</span>' +
-                    '</div>';
+    var markUp = '<div class="cssstats_col cssstats_' + parent + '_{{ class }}">' +
+        '<span class="cssstats_' + parent + '_prop">{{ prop.upper }}:</span>' +
+        '<span class="cssstats_' + parent + '_value">{{ value }}</span>' +
+        '</div>';
 
-    output +=       getHtmlByKeyVal(obj, markUp);
+    output += getHtmlByKeyVal(obj, markUp);
 
     return output + "\n";
 };
@@ -152,16 +160,16 @@ var getSizeSection = function getSizeSection (obj, parent) {
  * @param parent
  * @returns {string}
  */
-var getDefaultSection = function getSizeSection (obj, parent) {
+var getDefaultSection = function getSizeSection(obj, parent) {
 
-    var output =    getHeadline(parent);
+    var output = getHeadline(parent);
 
-    var markUp =    '<div class="cssstats_col cssstats_' + parent +'_{{ class }}">' +
+    var markUp = '<div class="cssstats_col cssstats_' + parent + '_{{ class }}">' +
         '<span class="cssstats_' + parent + '_value">{{ value }}</span>' +
         '<span class="cssstats_' + parent + '_prop">{{ prop }}</span>' +
         '</div>';
 
-    output +=       getHtmlByKeyVal(obj, markUp);
+    output += getHtmlByKeyVal(obj, markUp);
 
     return output + "\n";
 };
@@ -174,9 +182,9 @@ var getDefaultSection = function getSizeSection (obj, parent) {
  * @param parent
  * @returns {string}
  */
-var getMediaQueriesSection = function getMediaQueriesSection (obj, parent) {
+var getMediaQueriesSection = function getMediaQueriesSection(obj, parent) {
 
-    var output =    getHeadline(parent);
+    var output = getHeadline(parent);
 
     var markUp = '<div class="cssstats_col">' +
         '<span>{{ prop }} ' +
@@ -184,7 +192,7 @@ var getMediaQueriesSection = function getMediaQueriesSection (obj, parent) {
         '</span>' +
         '</div>';
 
-    output +=       getHtmlByKeyVal(obj, markUp);
+    output += getHtmlByKeyVal(obj, markUp);
 
     return output + "\n";
 };
@@ -198,7 +206,7 @@ var getMediaQueriesSection = function getMediaQueriesSection (obj, parent) {
  * @param parent
  * @returns {string}
  */
-var getGraphs = function getGraphs (obj, parent) {
+var getGraphs = function getGraphs(obj, parent) {
 
     var output = '';
     var chartWidth = 1200;
@@ -210,31 +218,29 @@ var getGraphs = function getGraphs (obj, parent) {
             var i = 1;
             var highest = 0;
 
-            obj[prop].forEach( function (val) {
+            obj[prop].forEach(function (val) {
                 highest = val > highest ? val : highest;
             });
 
-            output +=   '<section class="cssstats_' + prop + '">' + "\n";
-            output +=   getHeadline(prop);
-            output +=   '<svg viewBox="0 0 ' + chartWidth + ' ' +
-                        chartHeight +'" class="cssstats_chart" preserveAspectRatio="none">' + "\n";
+            output += '<section class="cssstats_' + prop + '">' + "\n";
+            output += getHeadline(prop);
+            output += '<svg viewBox="0 0 ' + chartWidth + ' ' +
+            chartHeight + '" class="cssstats_chart" preserveAspectRatio="none">' + "\n";
 
             for (var j = 0; j <= 5; j++) {
                 var y = (chartHeight / 5 * j) + 0.5;
 
 
-
-                output += '<line x1="0" y1="'+ y +'" x2="'+ chartWidth +'" y2="'+ y +'"/>' + "\n";
-                output += '<text x="3" y="'+ (y + 15) +'">' +
+                output += '<line x1="0" y1="' + y + '" x2="' + chartWidth + '" y2="' + y + '"/>' + "\n";
+                output += '<text x="3" y="' + (y + 15) + '">' +
                 (highest / (j + 1)).toFixed(0) +
                 '</text>' + "\n";
             }
 
 
-
             output += '<path d="M 0 ' + chartHeight + ' L ' + "\n";
 
-            obj[prop].forEach( function (val) {
+            obj[prop].forEach(function (val) {
 
                 var x = ((chartWidth / obj[prop].length) * i),
                     y = (chartHeight - (chartHeight / highest * val));
@@ -276,7 +282,7 @@ var getGraphs = function getGraphs (obj, parent) {
  * @param parent
  * @returns {string}
  */
-var getUniqueValuesSection = function getUniqueValuesSection (obj, parent) {
+var getUniqueValuesSection = function getUniqueValuesSection(obj, parent) {
 
     var output = '';
 
@@ -286,7 +292,7 @@ var getUniqueValuesSection = function getUniqueValuesSection (obj, parent) {
             switch (prop) {
                 case 'colors':
                     var markUp = '<div class="cssstats_col"><span style="color: {{ prop }}">Aa</span>' +
-                        '<span class="cssstats_colors_prop">' +'{{ prop }}' +
+                        '<span class="cssstats_colors_prop">' + '{{ prop }}' +
                         '<span class="cssstats_multiplier"> ({{ value }}&times;)</span>' +
                         '</span>' +
                         '</div>';
@@ -309,8 +315,8 @@ var getUniqueValuesSection = function getUniqueValuesSection (obj, parent) {
                         '</div>';
                     break;
                 default:
-                    var markUp = '<div class="cssstats_col cssstats_' + parent +'_{{ class }}">' +
-                            '{{ prop }}: {{ value }}' +
+                    var markUp = '<div class="cssstats_col cssstats_' + parent + '_{{ class }}">' +
+                        '{{ prop }}: {{ value }}' +
                         '</div>';
             }
 
@@ -327,11 +333,11 @@ var getUniqueValuesSection = function getUniqueValuesSection (obj, parent) {
                 obj[prop].forEach(function (o) {
                     var style = o.viewSizeStr ? o.viewSizeStr : o.viewSizePx + 'px';
 
-                            output += '<div class="cssstats_col">' +
-                            '<span style="font-size: ' + style + '">Font Size: ' + o.cssSize +
-                            '<span class="cssstats_multiplier"> ('+  + o.amount + '&times;)</span>' +
-                            '</span>' +
-                            '</div>';
+                    output += '<div class="cssstats_col">' +
+                    '<span style="font-size: ' + style + '">Font Size: ' + o.cssSize +
+                    '<span class="cssstats_multiplier"> (' + +o.amount + '&times;)</span>' +
+                    '</span>' +
+                    '</div>';
                 });
 
             }
@@ -340,9 +346,149 @@ var getUniqueValuesSection = function getUniqueValuesSection (obj, parent) {
         }
     }
 
-    output +=       getHtmlByKeyVal(obj, '');
+    output += getHtmlByKeyVal(obj, '');
 
     return output + "\n";
+};
+
+var getLintSection = function getLintSection(obj, parent) {
+    var output = getHeadline(parent);
+
+    output += '<div class="cssstats_col"><table class="cssstats_lint_results">' +
+    '<thead>' +
+    '<tr>' +
+    '    <th>Occurrences</th>' +
+    '    <th>Message</th>' +
+    '    <th>Browsers</th>' +
+    '</tr>' +
+    '</thead>' +
+    '<tbody>';
+
+    for (var prop in obj) {
+        if (obj.hasOwnProperty(prop)) {
+
+            obj[prop]['messages'].forEach(function (message) {
+
+                var occourrence = message.line && message.col ? message.line + ' : ' + message.col : '';
+                var hint = getLintMessage(message.message, message.rule.name, message.rule.desc, message.evidence);
+
+                output += '<tr>';
+                output += '<td style="border-left-color:' + getLintTypeColor(message.type) +
+                '" class="cssstats_lint_occurrences">' +
+                '<span class="cssstats_lint_file">' + prop + '</span>' +
+                occourrence + '</td>';
+                output += '<td class="cssstats_lint_message">' + hint + '</td>';
+                output += '<td class="cssstats_lint_browsers">' + message.rule.browsers + '</td>';
+                output += '</tr>';
+            });
+
+        }
+    }
+
+    output += '</tbody></table></div>';
+
+    return output;
+};
+
+var getGroupedLintSection = function getGroupedLintSection(obj, parent) {
+    var output = getHeadline(parent);
+
+    for (var prop in obj) {
+
+        var amount = obj[prop].amount;
+        var messages = obj[prop].messages;
+
+        output += '<h2 style="background:' + getLintTypeColor(prop) + '">'+ amount + ' ' + prop;
+        output += amount > 1 ? 's</h2>' : '</h2>';
+
+        for (var type in messages) {
+
+            output += '<div style="float: none;" class="cssstats_col">' +
+            '<table class="cssstats_lint_results">' +
+                '<caption>'+ messages[type].amount + ' ' + type + '</caption>' +
+            '<thead>' +
+            '<tr>' +
+            '    <th>Occurrences</th>' +
+            '    <th>Message</th>' +
+            '    <th>Browsers</th>' +
+            '</tr>' +
+            '</thead>' +
+            '<tbody>';
+
+            messages[type].messages.forEach(function (message) {
+                var occourrence = message.line && message.col ? message.line + ' : ' + message.col : '';
+                var hint = getLintMessage(message.message, message.rule.name, message.rule.desc, message.evidence);
+
+                output += '<tr>';
+                output += '<td style="border-left-color:' + getLintTypeColor(prop) +
+                '" class="cssstats_lint_occurrences">' +
+                '<span class="cssstats_lint_file">' + message.file + '</span>' +
+                occourrence + '</td>';
+                output += '<td class="cssstats_lint_message">' + hint + '</td>';
+                output += '<td class="cssstats_lint_browsers">' + message.rule.browsers + '</td>';
+                output += '</tr>';
+
+            });
+
+            output += '</tbody></table></div><hr>';
+        }
+    }
+
+    return output;
+};
+
+var getLintMessage = function getLintMessage(message, rule, desc, evidence) {
+
+    var lintMessage = '<span class="cssstats_lint_rule">Lint Rule: ' + rule + '</span>' +
+        '<p><b>' + message + '</b>';
+
+    if (desc && message !== desc) {
+        lintMessage += '<br>' + desc;
+    }
+
+    if (evidence) {
+        lintMessage += '</p><code>' + evidence + '</code>';
+    } else {
+        lintMessage += '</p>';
+    }
+
+    return lintMessage;
+
+};
+
+var getLintTypeColor = function getLintTypeColor(type) {
+
+    switch (type) {
+        case 'warning':
+            return '#fc0';
+        case 'error':
+            return '#f00';
+        default :
+            return strToColor(type);
+    }
+
+};
+
+var strToColor = function strToColor(str) {
+
+    function hashCode(str) { // java String#hashCode
+        var hash = 0;
+        for (var i = 0; i < str.length; i++) {
+            hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        return hash;
+    }
+
+    function intToRGB(i) {
+        var c = (i & 0x00FFFFFF)
+            .toString(16)
+            .toUpperCase();
+
+        return "00000".substring(0, 6 - c.length) + c;
+    }
+
+    return intToRGB(hashCode(str));
+
 };
 
 
