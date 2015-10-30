@@ -1,6 +1,6 @@
 # grunt-css-statistics
-[![Current Version](https://img.shields.io/npm/v/ddp-dump.svg)](https://www.npmjs.org/package/ddp-dump)
-[![Dependency Status](https://david-dm.org/hxseven/ddp-dump.svg)](https://david-dm.org/hxseven/ddp-dump)
+[![Current Version](https://img.shields.io/npm/v/grunt-css-statistics.svg)](https://www.npmjs.org/package/grunt-css-statistics)
+[![Dependency Status](https://david-dm.org/thotzl/grunt-css-statistics.svg)](https://david-dm.org/thotzl/grunt-css-statistics)
 
 > Grunt plugin like cssstats.com. Generates Json and HTML. Has CSSLint support.
 
