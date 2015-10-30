@@ -39,7 +39,14 @@ module.exports = function(grunt) {
         addRawCss:      false,
         addHtmlStyles:  false,
         addGraphs:      true,
-        csslint:        false
+        csslint:            {
+          clearDefaults: false,                         // true = deletes all standard rules
+          ruleset:  {// path to your ruleset file
+            'zero-units': true,                      // adds zero-units to ruleset
+            'adjoining-classes': false
+          },
+          groupResults: true                           // group analysis by rules
+        }
       },
       compact: {
         files: {
