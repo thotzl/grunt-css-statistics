@@ -2,9 +2,9 @@
 [![Current Version](https://img.shields.io/npm/v/grunt-css-statistics.svg)](https://www.npmjs.org/package/grunt-css-statistics)
 [![Dependency Status](https://david-dm.org/thotzl/grunt-css-statistics.svg)](https://david-dm.org/thotzl/grunt-css-statistics)
 
-> Grunt plugin like cssstats.com. Generates Json and HTML. Has CSSLint support.
+> Grunt plugin like cssstats.com. Generates Json and HTML. Has CSSLint support. ([HTML result demo](http://pixlich.de))
 
-This is beta. No unit tests yet. With some config variations it may be buggy. 
+This is beta. No unit tests yet. With some config variations it may be buggy.
 
 ## Getting Started
 This plugin requires Grunt `~0.4.5`
@@ -206,6 +206,7 @@ grunt.initConfig({
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
 
 ## Release History
+- 0.9.4 - added labels to readme …
 - 0.9.3 - a little bit of clean up …
 - 0.9.2 - a little bit of clean up …
 - 0.9.1 - added csslint option - fix for rulesets
