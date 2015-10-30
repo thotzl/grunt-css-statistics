@@ -12,7 +12,7 @@ var parseCsslint = function parseCsslint(a, options, cssObject) {
     } catch (e) {
         grunt.log.warn(e);
         grunt.log.warn('make sure you have installed the npm package csslint');
-        grunt.log.warn(chalkInfo('https://www.npmjs.com/package/csslint'));
+        grunt.log.warn(app.chalkInfo('https://www.npmjs.com/package/csslint'));
         return false;
     }
     
