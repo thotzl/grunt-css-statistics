@@ -206,6 +206,7 @@ grunt.initConfig({
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
 
 ## Release History
+- 0.9.3 - a little bit of clean up …
 - 0.9.2 - a little bit of clean up …
 - 0.9.1 - added csslint option - fix for rulesets
 - 0.9.0 - added csslint option
