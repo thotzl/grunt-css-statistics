@@ -1,7 +1,7 @@
 {
   "name": "grunt-css-statistics",
-  "description": "Grunt plugin of cssstats.com",
-  "version": "0.9.1",
+  "description": "Grunt plugin of cssstats.com. Generates Json and HTML. Has CSSLint support.",
+  "version": "0.9.2",
   "homepage": "https://github.com/thotzl/grunt-css-statistics",
   "author": {
     "name": "Torsten 'thotzl' Hötzel",
@@ -39,7 +39,11 @@
     "css",
     "statistic",
     "analyzing",
-    "frontend"
+    "frontend",
+    "stylestats",
+    "grunt",
+    "analytics",
+    "quality assurance"
   ],
   "dependencies": {
     "chalk": "^1.1.1",
