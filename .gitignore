@@ -1,3 +1,4 @@
+/tmp
 node_modules
 npm-debug.log
 tmp
@@ -7,3 +8,5 @@ tmp
 tasks/lib/resources/.sass-cache
 tasks/lib/resources/config.rb
 tasks/lib/resources/styles.scss
+/test/cssstats_test.js
+/test/expected
