@@ -206,6 +206,7 @@ grunt.initConfig({
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
 
 ## Release History
+- 0.9.7 - fix for issue #6: forEach of undef in getValueCount()
 - 0.9.6 - minor, no code changes
 - 0.9.5 - added labels to readme …
 - 0.9.4 - added labels to readme …

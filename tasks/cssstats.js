@@ -102,13 +102,13 @@ module.exports = function (grunt) {
             propertyResets: {},
 
             uniqueValues: {
-                colors:           getValueCount(origin.declarations.properties['color']),
+                colors:           getValueCount(origin.declarations.properties['color'], 'color'),
                 backgroundColors: {},
                 fontSizes:        {},
-                fontFamilies:     getValueCount(origin.declarations.properties['font-family'])
+                fontFamilies:     getValueCount(origin.declarations.properties['font-family'], 'font-family')
             },
 
-            uniqueMediaQueries: getValueCount(origin.mediaQueries.values)
+            uniqueMediaQueries: getValueCount(origin.mediaQueries.values, 'mediaQueries')
         };
 
         if (options.addGraphs) {
@@ -159,7 +159,7 @@ module.exports = function (grunt) {
             });
         }
 
-        stats.uniqueValues.backgroundColors = getValueCount(bgColors);
+        stats.uniqueValues.backgroundColors = getValueCount(bgColors, 'bgColors');
 
         // get font sizes from shorthand attribute 'font'
         var fontSizes = origin.declarations.properties['font-size'] ?
@@ -178,7 +178,7 @@ module.exports = function (grunt) {
             });
         }
 
-        stats.uniqueValues.fontSizes = sortFontSizes(getValueCount(fontSizes));
+        stats.uniqueValues.fontSizes = sortFontSizes(getValueCount(fontSizes), 'fontSizes');
 
 
         stats.propertyResets = origin.declarations.getPropertyResets();
@@ -300,9 +300,16 @@ module.exports = function (grunt) {
      * @param values
      * @returns {{}}
      */
-    var getValueCount = function getValueCount(values) {
+    var getValueCount = function getValueCount(values, property) {
 
         var arr = {};
+
+        property = property ? property : '';
+
+        if (!values) {
+            grunt.log.writeln(app.chalkWarn('no ' + property + ' defined in your css'));
+            return arr;
+        }
 
         values.forEach(function (v) {
             v = v.replace(/['"]/g, '');
