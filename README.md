@@ -1,4 +1,4 @@
-# grunt-css-statistics
+# grunt-css-statistics (very outdated!)
 [![Current Version](https://img.shields.io/npm/v/grunt-css-statistics.svg)](https://www.npmjs.org/package/grunt-css-statistics)
 [![Dependency Status](https://david-dm.org/thotzl/grunt-css-statistics.svg)](https://david-dm.org/thotzl/grunt-css-statistics)
 
